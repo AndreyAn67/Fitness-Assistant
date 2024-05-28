@@ -1,5 +1,6 @@
 import wx
 from weather import get_weather, format_weather
+from authorization import create_user_table, register_user, login_user
 
 class FitnessAssistantApp(wx.Frame):
     def __init__(self, parent, title):
@@ -9,7 +10,9 @@ class FitnessAssistantApp(wx.Frame):
         vbox = wx.BoxSizer(wx.VERTICAL)
 
         # Create buttons for different use cases
-        buttons = [
+        self.buttons = []
+
+        use_cases = [
             ('Authorization', self.authorization),
             ('Settings', self.settings),
             ('Exit', self.exit_app),
@@ -23,10 +26,13 @@ class FitnessAssistantApp(wx.Frame):
             ('Recipe Recommendation', self.recipe_recommendation)
         ]
 
-        for label, handler in buttons:
+        for label, handler in use_cases:
             button = wx.Button(panel, label=label)
             vbox.Add(button, flag=wx.EXPAND|wx.ALL, border=5)
             button.Bind(wx.EVT_BUTTON, handler)
+            if label != 'Authorization':
+                button.Disable() # Disable buttons initially
+            self.buttons.append(button)
 
         panel.SetSizer(vbox)
 
@@ -34,7 +40,11 @@ class FitnessAssistantApp(wx.Frame):
         self.Show()
 
     def authorization(self, event):
-        wx.MessageBox('Authorization process', 'Info', wx.OK | wx.ICON_INFORMATION)
+        auth_dialog = AuthDialog(None, title='Authorization')
+        if auth_dialog.ShowModal() == wx.ID_OK:
+            for button in self.buttons:
+                button.Enable() # Enable all buttons after successful authorization
+        auth_dialog.Destroy()
 
     def settings(self, event):
         wx.MessageBox('Settings window', 'Info', wx.OK | wx.ICON_INFORMATION)
@@ -70,7 +80,54 @@ class FitnessAssistantApp(wx.Frame):
     def recipe_recommendation(self, event):
         wx.MessageBox('Recipe Recommendation window', 'Info', wx.OK | wx.ICON_INFORMATION)
 
+class AuthDialog(wx.Dialog):
+    def __init__(self, parent, title):
+        super(AuthDialog, self).__init__(parent, title=title, size=(350, 300))
+
+        panel = wx.Panel(self)
+        vbox = wx.BoxSizer(wx.VERTICAL)
+
+        self.username_label = wx.StaticText(panel, label="Username")
+        vbox.Add(self.username_label, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border=10)
+        self.username_text = wx.TextCtrl(panel)
+        vbox.Add(self.username_text, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border=10)
+
+        self.password_label = wx.StaticText(panel, label="Password")
+        vbox.Add(self.password_label, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border=10)
+        self.password_text = wx.TextCtrl(panel, style=wx.TE_PASSWORD)
+        vbox.Add(self.password_text, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border=10)
+
+        hbox = wx.BoxSizer(wx.HORIZONTAL)
+        self.register_button = wx.Button(panel, label='Register')
+        hbox.Add(self.register_button)
+        self.login_button = wx.Button(panel, label='Login')
+        hbox.Add(self.login_button, flag=wx.LEFT, border=5)
+        vbox.Add(hbox, flag=wx.ALIGN_CENTER|wx.TOP|wx.BOTTOM, border=10)
+
+        self.register_button.Bind(wx.EVT_BUTTON, self.on_register)
+        self.login_button.Bind(wx.EVT_BUTTON, self.on_login)
+
+        panel.SetSizer(vbox)
+
+    def on_register(self, event):
+        username = self.username_text.GetValue()
+        password = self.password_text.GetValue()
+        if register_user(username, password):
+            wx.MessageBox('Registration successful', 'Info', wx.OK | wx.ICON_INFORMATION)
+        else:
+            wx.MessageBox('Registration failed: Username already exists', 'Error', wx.OK | wx.ICON_ERROR)
+
+    def on_login(self, event):
+        username = self.username_text.GetValue()
+        password = self.password_text.GetValue()
+        if login_user(username, password):
+            wx.MessageBox('Login successful', 'Info', wx.OK | wx.ICON_INFORMATION)
+            self.EndModal(wx.ID_OK)
+        else:
+            wx.MessageBox('Login failed: Invalid username or password', 'Error', wx.OK | wx.ICON_ERROR)
+
 if __name__ == '__main__':
+    create_user_table()
     app = wx.App()
     FitnessAssistantApp(None, title='Fitness Assistant')
     app.MainLoop()
