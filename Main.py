@@ -4,7 +4,7 @@ from authorization import create_user_table, register_user, login_user
 
 class FitnessAssistantApp(wx.Frame):
     def __init__(self, parent, title):
-        super(FitnessAssistantApp, self).__init__(parent, title=title, size=(400, 400))
+        super(FitnessAssistantApp, self).__init__(parent, title=title, size=(800, 500))
 
         panel = wx.Panel(self)
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -59,11 +59,14 @@ class FitnessAssistantApp(wx.Frame):
         wx.MessageBox('Local Database window', 'Info', wx.OK | wx.ICON_INFORMATION)
 
     def weather(self, event):
-        api_key = 'def384d40c2435f9a16cf1157d25de34'
-        city = 'Novosibirsk'
-        weather_data = get_weather(api_key, city)
-        message = format_weather(weather_data, city)
-        wx.MessageBox(message, 'Weather', wx.OK | wx.ICON_INFORMATION)
+        dialog = wx.TextEntryDialog(self, 'Enter your location', 'Weather Location')
+        if dialog.ShowModal() == wx.ID_OK:
+            api_key = 'def384d40c2435f9a16cf1157d25de34'
+            city = dialog.GetValue()
+            weather_data = get_weather(api_key, city)
+            message = format_weather(weather_data, city)
+            wx.MessageBox(message, 'Weather', wx.OK | wx.ICON_INFORMATION)
+        dialog.Destroy()
 
     def weight(self, event):
         wx.MessageBox('Weight window', 'Info', wx.OK | wx.ICON_INFORMATION)
