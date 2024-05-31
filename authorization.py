@@ -10,6 +10,15 @@ def create_user_table():
             password TEXT NOT NULL
         )
     ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS weight_records(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            weight REAL,
+            date TEXT,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    ''')
     conn.commit()
     conn.close()
 
@@ -30,4 +39,4 @@ def login_user(username, password):
     cursor.execute('SELECT * FROM users WHERE username = ? AND password = ?', (username, password))
     user = cursor.fetchone()
     conn.close()
-    return user is not None
+    return user

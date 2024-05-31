@@ -1,4 +1,5 @@
 import wx
+from weight import record_weight, get_weight_records, plot_weight
 from weather import get_weather, format_weather
 from authorization import create_user_table, register_user, login_user
 
@@ -42,6 +43,7 @@ class FitnessAssistantApp(wx.Frame):
     def authorization(self, event):
         auth_dialog = AuthDialog(None, title='Authorization')
         if auth_dialog.ShowModal() == wx.ID_OK:
+            self.user_id = auth_dialog.user_id
             for button in self.buttons:
                 button.Enable() # Enable all buttons after successful authorization
         auth_dialog.Destroy()
@@ -69,7 +71,9 @@ class FitnessAssistantApp(wx.Frame):
         dialog.Destroy()
 
     def weight(self, event):
-        wx.MessageBox('Weight window', 'Info', wx.OK | wx.ICON_INFORMATION)
+        weight_dialog = WeightDialog(self, 'Weight Record', self.user_id)
+        weight_dialog.ShowModal()
+        weight_dialog.Destroy
 
     def meal(self, event):
         wx.MessageBox('Meal window', 'Info', wx.OK | wx.ICON_INFORMATION)
@@ -86,6 +90,7 @@ class FitnessAssistantApp(wx.Frame):
 class AuthDialog(wx.Dialog):
     def __init__(self, parent, title):
         super(AuthDialog, self).__init__(parent, title=title, size=(350, 300))
+        self.user_id = None
 
         panel = wx.Panel(self)
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -123,11 +128,53 @@ class AuthDialog(wx.Dialog):
     def on_login(self, event):
         username = self.username_text.GetValue()
         password = self.password_text.GetValue()
-        if login_user(username, password):
+        user = login_user(username, password)
+        if user:
+            self.user_id = user[0]
             wx.MessageBox('Login successful', 'Info', wx.OK | wx.ICON_INFORMATION)
             self.EndModal(wx.ID_OK)
         else:
             wx.MessageBox('Login failed: Invalid username or password', 'Error', wx.OK | wx.ICON_ERROR)
+
+class WeightDialog(wx.Dialog):
+    def __init__(self, parent, title, user_id):
+        super(WeightDialog, self).__init__(parent, title=title, size=(400, 300))
+        self.user_id = user_id
+
+        panel = wx.Panel(self)
+        vbox = wx.BoxSizer(wx.VERTICAL)
+
+        self.weight_label = wx. StaticText(panel, label='Enter your weight (kg)')
+        vbox.Add(self.weight_label, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border=10)
+        self.weight_text = wx.TextCtrl(panel)
+        vbox.Add(self.weight_text, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border=10)
+
+        hbox = wx.BoxSizer(wx.HORIZONTAL)
+        self.submit_button = wx.Button(panel, label='Submit')
+        hbox.Add(self.submit_button)
+        self.plot_button = wx.Button(panel, label='Show Plot')
+        hbox.Add(self.plot_button, flag=wx.LEFT, border=5)
+        vbox.Add(hbox, flag=wx.ALIGN_CENTER|wx.TOP|wx.BOTTOM, border=10)
+
+        self.submit_button.Bind(wx.EVT_BUTTON, self.on_submit)
+        self.plot_button.Bind(wx.EVT_BUTTON, self.on_show_plot)
+
+        panel.SetSizer(vbox)
+
+    def on_submit(self, event):
+        try:
+            weight = float(self.weight_text.GetValue())
+            record_weight(self.user_id, weight)
+            wx.MessageBox('Weight recorded successfully', 'Info', wx.OK|wx.ICON_INFORMATION)
+        except ValueError:
+            wx.MessageBox('Invalid weight value', 'Error', wx.OK|wx.ICON_ERROR)    
+
+    def on_show_plot(self, event):
+        records = get_weight_records(self.user_id)
+        if records:
+            plot_weight(records)
+        else:
+            wx.MessageBox('No weight records found', 'Info', wx.OK | wx.ICON_INFORMATION)
 
 if __name__ == '__main__':
     create_user_table()
