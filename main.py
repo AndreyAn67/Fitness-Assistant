@@ -2,6 +2,7 @@ import wx
 from weight import record_weight, get_weight_records, plot_weight
 from weather import get_weather, format_weather
 from authorization import create_user_table, register_user, login_user
+from body_data import create_body_data_table, BodyDataDialog
 
 class FitnessAssistantApp(wx.Frame):
     def __init__(self, parent, title):
@@ -18,7 +19,6 @@ class FitnessAssistantApp(wx.Frame):
             ('Settings', self.settings),
             ('Exit', self.exit_app),
             ('Body Data and Personal Data', self.body_data),
-            ('Local Database', self.local_database),
             ('Weather', self.weather),
             ('Weight', self.weight),
             ('Meal', self.meal),
@@ -55,10 +55,10 @@ class FitnessAssistantApp(wx.Frame):
         self.Close()
 
     def body_data(self, event):
-        wx.MessageBox('Body Data and Personal Data window', 'Info', wx.OK | wx.ICON_INFORMATION)
+        dialog = BodyDataDialog(self, self.user_id)
+        dialog.ShowModal()
+        dialog.Destroy()
 
-    def local_database(self, event):
-        wx.MessageBox('Local Database window', 'Info', wx.OK | wx.ICON_INFORMATION)
 
     def weather(self, event):
         dialog = wx.TextEntryDialog(self, 'Enter your location', 'Weather Location')
@@ -178,6 +178,7 @@ class WeightDialog(wx.Dialog):
 
 if __name__ == '__main__':
     create_user_table()
+    create_body_data_table()
     app = wx.App()
     FitnessAssistantApp(None, title='Fitness Assistant')
     app.MainLoop()
