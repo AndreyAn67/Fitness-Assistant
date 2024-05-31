@@ -4,6 +4,7 @@ from weather import get_weather, format_weather
 from authorization import create_user_table, register_user, login_user
 from body_data import create_body_data_table, BodyDataDialog
 from training import create_training_table, TrainingDialog
+from meal import create_meal_table, MealDialog
 
 class FitnessAssistantApp(wx.Frame):
     def __init__(self, parent, title):
@@ -17,15 +18,14 @@ class FitnessAssistantApp(wx.Frame):
 
         use_cases = [
             ('Authorization', self.authorization),
-            ('Settings', self.settings),
-            ('Exit', self.exit_app),
             ('Body Data and Personal Data', self.body_data),
             ('Weather', self.weather),
             ('Weight', self.weight),
             ('Meal', self.meal),
             ('Training', self.training),
             ('Calorie Counting', self.calorie_counting),
-            ('Recipe Recommendation', self.recipe_recommendation)
+            ('Recipe Recommendation', self.recipe_recommendation),
+            ('Exit', self.exit_app)
         ]
 
         for label, handler in use_cases:
@@ -48,9 +48,6 @@ class FitnessAssistantApp(wx.Frame):
             for button in self.buttons:
                 button.Enable() # Enable all buttons after successful authorization
         auth_dialog.Destroy()
-
-    def settings(self, event):
-        wx.MessageBox('Settings window', 'Info', wx.OK | wx.ICON_INFORMATION)
 
     def exit_app(self, event):
         self.Close()
@@ -77,7 +74,9 @@ class FitnessAssistantApp(wx.Frame):
         weight_dialog.Destroy
 
     def meal(self, event):
-        wx.MessageBox('Meal window', 'Info', wx.OK | wx.ICON_INFORMATION)
+        meal_dialog = MealDialog(self, self.user_id)
+        meal_dialog.ShowModal()
+        meal_dialog.Destroy()
 
     def training(self, event):
         training_dialog = TrainingDialog(self, self.user_id)
@@ -183,6 +182,7 @@ if __name__ == '__main__':
     create_user_table()
     create_body_data_table()
     create_training_table()
+    create_meal_table()
     app = wx.App()
     FitnessAssistantApp(None, title='Fitness Assistant')
     app.MainLoop()
