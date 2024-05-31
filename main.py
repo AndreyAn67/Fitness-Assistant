@@ -3,6 +3,7 @@ from weight import record_weight, get_weight_records, plot_weight
 from weather import get_weather, format_weather
 from authorization import create_user_table, register_user, login_user
 from body_data import create_body_data_table, BodyDataDialog
+from training import create_training_table, TrainingDialog
 
 class FitnessAssistantApp(wx.Frame):
     def __init__(self, parent, title):
@@ -79,7 +80,9 @@ class FitnessAssistantApp(wx.Frame):
         wx.MessageBox('Meal window', 'Info', wx.OK | wx.ICON_INFORMATION)
 
     def training(self, event):
-        wx.MessageBox('Training window', 'Info', wx.OK | wx.ICON_INFORMATION)
+        training_dialog = TrainingDialog(self, self.user_id)
+        training_dialog.ShowModal()
+        training_dialog.Destroy()
 
     def calorie_counting(self, event):
         wx.MessageBox('Calorie Counting window', 'Info', wx.OK | wx.ICON_INFORMATION)
@@ -179,6 +182,7 @@ class WeightDialog(wx.Dialog):
 if __name__ == '__main__':
     create_user_table()
     create_body_data_table()
+    create_training_table()
     app = wx.App()
     FitnessAssistantApp(None, title='Fitness Assistant')
     app.MainLoop()
