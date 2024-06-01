@@ -46,7 +46,7 @@ def get_meals_for_date(user_id, date):
 
 class MealDialog(wx.Dialog):
     def __init__(self, parent, user_id):
-        super(MealDialog, self).__init__(parent, title="Meals", size=(600, 400))
+        super(MealDialog, self).__init__(parent, title="Meals", size=(1200, 800))
         self.user_id = user_id
 
         self.calendar = wx.adv.CalendarCtrl(self, style=wx.adv.CAL_SHOW_HOLIDAYS)

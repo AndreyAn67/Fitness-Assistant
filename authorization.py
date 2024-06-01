@@ -44,7 +44,7 @@ def login_user(username, password):
 
 class AuthDialog(wx.Dialog):
     def __init__(self, parent, title):
-        super(AuthDialog, self).__init__(parent, title=title, size=(350, 300))
+        super(AuthDialog, self).__init__(parent, title=title, size=(500, 300))
         self.user_id = None
 
         panel = wx.Panel(self)

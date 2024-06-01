@@ -8,10 +8,22 @@ from meal import create_meal_table, MealDialog
 
 class FitnessAssistantApp(wx.Frame):
     def __init__(self, parent, title):
-        super(FitnessAssistantApp, self).__init__(parent, title=title, size=(800, 500))
+        super(FitnessAssistantApp, self).__init__(parent, title=title, size=(1600, 900))
 
         panel = wx.Panel(self)
-        vbox = wx.BoxSizer(wx.VERTICAL)
+        main_sizer = wx.BoxSizer(wx.VERTICAL)
+
+        #Add image to the panel
+        image = wx.Image('logo.jpeg', wx.BITMAP_TYPE_JPEG)
+        image_bitmap = wx.StaticBitmap(panel, wx.ID_ANY, wx.Bitmap(image))
+        main_sizer.Add(image_bitmap, flag=wx.CENTER | wx.TOP, border=10)
+
+        header = wx.StaticText(panel, label="Fitness Assistant", style=wx.ALIGN_CENTER)
+        font = header.GetFont()
+        font.PointSize += 10
+        font = font.Bold()
+        header.SetFont(font)
+        main_sizer.Add(header, flag=wx.CENTER | wx.ALL, border=10)
 
         # Create buttons for different use cases
         self.buttons = []
@@ -26,15 +38,18 @@ class FitnessAssistantApp(wx.Frame):
             ('Exit', self.exit_app)
         ]
 
-        for label, handler in use_cases:
-            button = wx.Button(panel, label=label)
-            vbox.Add(button, flag=wx.EXPAND|wx.ALL, border=5)
+        grid_sizer = wx.GridBagSizer(hgap=10, vgap=10)
+
+        for i, (label, handler) in enumerate(use_cases):
+            button = wx.Button(panel, label=label, size=(300,100))
+            grid_sizer.Add(button, pos=(i//4, i%4), flag=wx.ALIGN_CENTER)
             button.Bind(wx.EVT_BUTTON, handler)
             if label != 'Authorization':
                 button.Disable() # Disable buttons initially
             self.buttons.append(button)
 
-        panel.SetSizer(vbox)
+        main_sizer.Add(grid_sizer, proportion=1 ,flag=wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL | wx.ALL, border=10)
+        panel.SetSizer(main_sizer)
 
         self.Centre()
         self.Show()

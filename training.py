@@ -89,7 +89,7 @@ def plot_weight_changes(records):
 
 class TrainingDialog(wx.Dialog):
     def __init__(self, parent, user_id):
-        super(TrainingDialog, self).__init__(parent, title="Training", size=(400, 400))
+        super(TrainingDialog, self).__init__(parent, title="Training", size=(800, 800))
         self.user_id = user_id
 
         self.training_list = wx.ListCtrl(self, style=wx.LC_REPORT)

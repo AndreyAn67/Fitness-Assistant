@@ -45,7 +45,7 @@ def get_latest_weight(user_id):
 
 class BodyDataDialog(wx.Dialog):
     def __init__(self, parent, user_id):
-        super(BodyDataDialog, self).__init__(parent, title="Body Data", size=(300, 400))
+        super(BodyDataDialog, self).__init__(parent, title="Body Data", size=(600, 500))
         self.user_id = user_id
 
         self.height_label = wx.StaticText(self, label="Height (cm):")

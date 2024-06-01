@@ -16,7 +16,7 @@ def get_weight_records(user_id):
     cursor = conn.cursor()
     cursor.execute('SELECT weight, date FROM weight_records WHERE user_id = ? ORDER BY date', (user_id,))
     records = cursor.fetchall()
-    conn.close
+    conn.close()
     return records
 
 def plot_weight(records):
@@ -36,13 +36,13 @@ def plot_weight(records):
 
 class WeightDialog(wx.Dialog):
     def __init__(self, parent, title, user_id):
-        super(WeightDialog, self).__init__(parent, title=title, size=(400, 300))
+        super(WeightDialog, self).__init__(parent, title=title, size=(800, 600))
         self.user_id = user_id
 
         panel = wx.Panel(self)
         vbox = wx.BoxSizer(wx.VERTICAL)
 
-        self.weight_label = wx. StaticText(panel, label='Enter your weight (kg)')
+        self.weight_label = wx.StaticText(panel, label='Enter your weight (kg)')
         vbox.Add(self.weight_label, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border=10)
         self.weight_text = wx.TextCtrl(panel)
         vbox.Add(self.weight_text, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border=10)
