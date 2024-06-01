@@ -49,7 +49,10 @@ def record_anaerobic_exercise(user_id, name, sets, reps, weight):
 def get_training_data(user_id):
     conn = sqlite3.connect('fitness_assistant.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT id, name, type, date FROM training WHERE user_id = ?', (user_id,))
+    cursor.execute('''
+        SELECT id, name, type, sets, reps, duration, date FROM training 
+        WHERE user_id = ?
+    ''', (user_id,))
     records = cursor.fetchall()
     conn.close()
     return records
@@ -89,13 +92,16 @@ def plot_weight_changes(records):
 
 class TrainingDialog(wx.Dialog):
     def __init__(self, parent, user_id):
-        super(TrainingDialog, self).__init__(parent, title="Training", size=(800, 800))
+        super(TrainingDialog, self).__init__(parent, title="Training", size=(800, 600))
         self.user_id = user_id
 
         self.training_list = wx.ListCtrl(self, style=wx.LC_REPORT)
         self.training_list.InsertColumn(0, 'Name', width=140)
         self.training_list.InsertColumn(1, 'Type', width=100)
-        self.training_list.InsertColumn(2, 'Date', width=140)
+        self.training_list.InsertColumn(2, 'Sets', width=50)
+        self.training_list.InsertColumn(3, 'Reps', width=50)
+        self.training_list.InsertColumn(4, 'Duration', width=100)
+        self.training_list.InsertColumn(5, 'Date', width=140)
 
         self.load_training_data()
 
@@ -122,7 +128,10 @@ class TrainingDialog(wx.Dialog):
         for record in records:
             index = self.training_list.InsertItem(self.training_list.GetItemCount(), record[1])
             self.training_list.SetItem(index, 1, record[2])
-            self.training_list.SetItem(index, 2, record[3])
+            self.training_list.SetItem(index, 2, str(record[3]) if record[2] == 'anaerobic' else '')
+            self.training_list.SetItem(index, 3, str(record[4]) if record[2] == 'anaerobic' else '')
+            self.training_list.SetItem(index, 4, record[5] if record[2] == 'aerobic' else '')
+            self.training_list.SetItem(index, 5, record[6])
             self.training_list.SetItemData(index, record[0])
 
     def on_add(self, event):

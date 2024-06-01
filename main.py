@@ -18,6 +18,7 @@ class FitnessAssistantApp(wx.Frame):
         image_bitmap = wx.StaticBitmap(panel, wx.ID_ANY, wx.Bitmap(image))
         main_sizer.Add(image_bitmap, flag=wx.CENTER | wx.TOP, border=10)
 
+        #create header
         header = wx.StaticText(panel, label="Fitness Assistant", style=wx.ALIGN_CENTER)
         font = header.GetFont()
         font.PointSize += 10
